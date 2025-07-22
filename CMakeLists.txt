@@ -7,6 +7,9 @@ include_directories(NaiveSimulator)
 
 add_executable(CPU_Simulator
     include/Instruction.h
+    include/Executor.h
     main.cpp
     include/Memory.h
-    utility/utility.h)
+    utility/utility.h
+    utility/InputManager.h
+)
