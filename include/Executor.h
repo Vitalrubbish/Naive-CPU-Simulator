@@ -262,7 +262,6 @@ int clk = 0;
 inline unsigned int Execute() {
     while (true) {
         ++clk;
-        //std::cout << DecToHex(pc) << '\n';
         unsigned int code = memo.GetInstructionCode(pc);
         if (code == 0x0ff00513) {
             return regs.GetValue(10) % 256;

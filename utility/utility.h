@@ -36,22 +36,6 @@ inline unsigned int HexToDec(const std::string& hex) {
     return ret;
 }
 
-inline std::string DecToHex(unsigned int decimalNumber) {
-    if (decimalNumber == 0) {
-        return "0";
-    }
-    unsigned int num = decimalNumber;
-    std::string hexString;
-    const char hexChars[] = "0123456789abcdef";
-    while (num > 0) {
-        int remainder = num % 16;
-        hexString += hexChars[remainder];
-        num /= 16;
-    }
-    std::reverse(hexString.begin(), hexString.end());
-    return hexString;
-}
-
 inline int GetBit(const unsigned int& x, int index) {
     if ((x & 1U << index) != 0) {
         return 1;
