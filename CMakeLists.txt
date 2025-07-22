@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 include_directories(NaiveSimulator)
 
-add_executable(CPU_Simulator
+add_executable(code
     include/Instruction.h
     include/Executor.h
     include/InputManager.h
