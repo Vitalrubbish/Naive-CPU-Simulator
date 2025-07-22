@@ -34,4 +34,17 @@ inline unsigned int HexToDec(const std::string& hex) {
     }
     return ret;
 }
+
+inline int GetBit(const unsigned int& x, int index) {
+    if ((x & 1U << index) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+inline unsigned int SetBit(unsigned int x, int index, int val) {
+    x -= (GetBit(x, index) << index);
+    x += (val << index);
+    return x;
+}
 #endif //UTILITY_H

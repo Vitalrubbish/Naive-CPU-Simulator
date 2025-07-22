@@ -1,14 +1,15 @@
 #include <iostream>
-#include <cstring>
-#include <string>
-#include "include/Instruction.h"
 #include "include/Memory.h"
+#include "include/Register.h"
 #include "include/Executor.h"
-#include "utility/InputManager.h"
+#include "include/InputManager.h"
 
-Memory mem{};
+Memory memo{};
+Register regs{};
 
 int main() {
+    freopen("sample.data", "r", stdin);
     ManageInput();
-    Execute();
+    unsigned int ret = Execute();
+    std::cout << ret << '\n';
 }
