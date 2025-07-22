@@ -2,6 +2,7 @@
 #define UTILITY_H
 #include <cstring>
 #include <string>
+#include <algorithm>
 
 inline unsigned int SymbolTransfer(char sym) {
     unsigned int ret;
@@ -33,6 +34,22 @@ inline unsigned int HexToDec(const std::string& hex) {
         ret = ret * 16 + SymbolTransfer(it);
     }
     return ret;
+}
+
+inline std::string DecToHex(unsigned int decimalNumber) {
+    if (decimalNumber == 0) {
+        return "0";
+    }
+    unsigned int num = decimalNumber;
+    std::string hexString;
+    const char hexChars[] = "0123456789abcdef";
+    while (num > 0) {
+        int remainder = num % 16;
+        hexString += hexChars[remainder];
+        num /= 16;
+    }
+    std::reverse(hexString.begin(), hexString.end());
+    return hexString;
 }
 
 inline int GetBit(const unsigned int& x, int index) {

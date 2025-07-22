@@ -2,11 +2,13 @@
 #define EXECUTOR_H
 #include "Memory.h"
 #include "Instruction.h"
+#include <unistd.h>
 extern Memory memo;
 extern Register regs;
 unsigned int pc = 0;
 
 inline void ExecuteSingle(const Instruction& ins) {
+    regs.PutValue(0, 0);
     switch (ins.type) {
         case InstructionType::LUI: {
             auto val = ins.imm;
@@ -32,98 +34,112 @@ inline void ExecuteSingle(const Instruction& ins) {
             break;
         }
         case InstructionType::BEQ: {
+            int offset = static_cast<int>(ins.imm << 20) >> 20;
             if (regs.GetValue(ins.rs1) == regs.GetValue(ins.rs2)) {
-                pc = pc + ins.imm;
+                pc = pc + offset;
             } else {
                 pc += 4;
             }
             break;
         }
         case InstructionType::BGE: {
+            int offset = static_cast<int>(ins.imm << 20) >> 20;
             if (regs.GetSignedValue(ins.rs1) >= regs.GetSignedValue(ins.rs2)) {
-                pc = pc + ins.imm;
+                pc = pc + offset;
             } else {
                 pc += 4;
             }
             break;
         }
         case InstructionType::BGEU: {
+            int offset = static_cast<int>(ins.imm << 20) >> 20;
             if (regs.GetValue(ins.rs1) >= regs.GetValue(ins.rs2)) {
-                pc = pc + ins.imm;
+                pc = pc + offset;
             } else {
                 pc += 4;
             }
             break;
         }
         case InstructionType::BLT: {
+            int offset = static_cast<int>(ins.imm << 20) >> 20;
             if (regs.GetSignedValue(ins.rs1) < regs.GetSignedValue(ins.rs2)) {
-                pc = pc + ins.imm;
+                pc = pc + offset;
             } else {
                 pc += 4;
             }
             break;
         }
         case InstructionType::BLTU: {
+            int offset = static_cast<int>(ins.imm << 20) >> 20;
             if (regs.GetValue(ins.rs1) < regs.GetValue(ins.rs2)) {
-                pc = pc + ins.imm;
+                pc = pc + offset;
             } else {
                 pc += 4;
             }
             break;
         }
         case InstructionType::BNE: {
+            int offset = static_cast<int>(ins.imm << 20) >> 20;
             if (regs.GetValue(ins.rs1) != regs.GetValue(ins.rs2)) {
-                pc = pc + ins.imm;
+                pc = pc + offset;
             } else {
                 pc += 4;
             }
             break;
         }
         case InstructionType::LB: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
             regs.PutValue(ins.rd, memo.LoadByte(index, true));
             pc += 4;
             break;
         }
         case InstructionType::LBU: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
             regs.PutValue(ins.rd, memo.LoadByte(index, false));
             pc += 4;
             break;
         }
         case InstructionType::LH: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
             regs.PutValue(ins.rd, memo.LoadHalf(index, true));
             pc += 4;
             break;
         }
         case InstructionType::LHU: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
             regs.PutValue(ins.rd, memo.LoadHalf(index, false));
             pc += 4;
             break;
         }
         case InstructionType::LW: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
             regs.PutValue(ins.rd, memo.LoadWord(index));
             pc += 4;
             break;
         }
         case InstructionType::SB: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
             memo.StoreByte(index, regs.GetValue(ins.rs2));
             pc += 4;
             break;
         }
         case InstructionType::SH: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
             memo.StoreHalf(index, regs.GetValue(ins.rs2));
             pc += 4;
             break;
         }
         case InstructionType::SW: {
-            unsigned int index = regs.GetValue(ins.rs1) + ins.imm;
-            memo.StoreByte(index, regs.GetValue(ins.rs2));
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            unsigned int index = regs.GetValue(ins.rs1) + imm;
+            memo.StoreWord(index, regs.GetValue(ins.rs2));
             pc += 4;
             break;
         }
@@ -186,7 +202,8 @@ inline void ExecuteSingle(const Instruction& ins) {
             break;
         }
         case InstructionType::ADDI: {
-            regs.PutValue(ins.rd, regs.GetValue(ins.rs1) + ins.imm);
+            int imm = static_cast<int>(ins.imm << 20) >> 20;
+            regs.PutValue(ins.rd, regs.GetValue(ins.rs1) + imm);
             pc += 4;
             break;
         }
@@ -241,10 +258,11 @@ inline void ExecuteSingle(const Instruction& ins) {
         default:;
     }
 }
-
+int clk = 0;
 inline unsigned int Execute() {
     while (true) {
-        std::cout << pc << '\n';
+        ++clk;
+        //std::cout << DecToHex(pc) << '\n';
         unsigned int code = memo.GetInstructionCode(pc);
         if (code == 0x0ff00513) {
             return regs.GetValue(10) % 256;
